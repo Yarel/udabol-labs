@@ -1,0 +1,39 @@
+#include "stdafx.h"
+#include "locale.h"
+#include "stdio.h"
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+    setlocale(LC_CTYPE, "Spanish");
+
+    char cadena[20];
+    FILE* archivo;
+
+    printf("LECTURA DE ARCHIVO (con fscanf)\n\n");
+
+    archivo = fopen("texto.txt", "r");
+
+    if (archivo != NULL)
+    {
+        printf("Presione Enter para ver el archivo");
+        getchar();
+
+        printf("El contenido del archivo es: \n\n");
+
+        while (feof(archivo) == 0)
+        {
+            fscanf(archivo, "%s", &cadena);
+            printf("%s\n", cadena);
+        }
+
+        fclose(archivo);
+    }
+    else
+    {
+        printf("¡Se produjo un error al intentar leer el archivo!");
+    }
+
+    getchar();
+    return 0;
+}
+
