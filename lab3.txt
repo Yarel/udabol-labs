@@ -171,7 +171,7 @@ int _tmain(int argc, _TCHAR* argv[])
                             {
                                 Archivo = fopen("Agenda.txt", "w");
                                 for (i = 1; i <= cont; i++)
-                                {
+                         
                                     if (i != reg)
                                     {
                                         if (i != 1)
@@ -181,7 +181,7 @@ int _tmain(int argc, _TCHAR* argv[])
                                         fprintf(Archivo, "%d\n", Personas[i].Celular);
                                         fprintf(Archivo, "%d\n", Personas[i].TelefonoFijo);
                                         fprintf(Archivo, "%s\n", Personas[i].Direccion);
-                                        fprintf(Archivo, "%c", Personas[i].Sexo);
+                                        fprintf(Archivo, "%c\n", Personas[i].Sexo);
                                     }
                                 }
                                 fclose(Archivo);
@@ -197,7 +197,7 @@ int _tmain(int argc, _TCHAR* argv[])
                             printf("El archivo está vacío!\n");
                             getchar();
                         }
-                    }
+                    
                     break;
                 case 4:
                     // Paso 1: Cargar los registros del archivo al vector
@@ -216,7 +216,7 @@ int _tmain(int argc, _TCHAR* argv[])
                                 fscanf(Archivo, "%d", &Personas[cont].Celular);
                                 fscanf(Archivo, "%d", &Personas[cont].TelefonoFijo);
                                 fscanf(Archivo, "%s", &Personas[cont].Direccion);
-                                fscanf(Archivo, "%c", &Personas[cont].Sexo);
+                                fscanf(Archivo, " %c", &Personas[cont].Sexo);
                             }
                             else
                                 cont--;
