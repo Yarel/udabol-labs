@@ -1,0 +1,388 @@
+#include "stdafx.h"
+#include "stdio.h"
+#include "string.h"
+#include "iostream"
+#include "locale.h"
+
+bool ArchivoVacio()
+{
+    FILE *Archivo;
+    bool Vacio;
+    Archivo = fopen("Agenda.txt", "r");
+    fgetc(Archivo);
+    Vacio = (feof(Archivo) != 0);
+    fclose(Archivo);
+    return Vacio;
+}
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+    setlocale(LC_CTYPE, "Spanish");
+    struct Agenda
+    {
+        int CI;
+        char Nombre[25];
+        int Celular;
+        int TelefonoFijo;
+        char Dirección[30];
+        char Sexo;
+    };
+    
+    FILE *Archivo;
+    Agenda Persona, Personas[101];
+    char Respuesta;
+    int Opción, Opción2, i, cont, CI, reg;
+    bool Vacio;
+    do
+    {
+        system("cls");
+        printf("    AGENDA DE PERSONAS\n\n");
+        printf("(1) Creación de archivo\n");
+        printf("(2) Adición de registro(s)\n");
+        printf("(3) Eliminación de registro(s)\n");
+        printf("(4) Modificación de registro(s)\n");
+        printf("(5) Listado de registro(s)\n");
+        printf("(6) Salir\n\n");
+        printf("    Opción: ");
+        do
+        {
+            scanf("%d", &Opción);
+        } while (Opción < 1 || Opción > 6);
+        getchar();
+        if (Opción < 6)
+        {
+            system("cls");
+            switch (Opción)
+            {
+                case 1:
+                    Archivo = fopen("Agenda.txt", "w");
+                    fclose(Archivo);
+                    printf("¡Se creó exitosamente el archivo!\n");
+                    getchar();
+                    getchar();
+                    break;
+                case 2:
+                    Vacio = ArchivoVacio();
+                    Archivo = fopen("Agenda.txt", "a");
+                    do
+                    {
+                        do
+                        {
+                            printf("CI                  : ");
+                            scanf("%d", &Persona.CI);
+                        } while (Persona.CI <= 100000 || Persona.CI >= 20000000);
+                        do
+                        {
+                            printf("Nombre              : ");
+                            scanf("%s", &Persona.Nombre);
+                        } while (strlen(Persona.Nombre) == 0);
+                        do
+                        {
+                            printf("Celular             : ");
+                            scanf("%d", &Persona.Celular);
+                        } while (Persona.Celular <= 60000000 || Persona.Celular >= 79000000);
+                        do
+                        {
+                            printf("Teléfono Fijo       : ");
+                            scanf("%d", &Persona.TeléfonoFijo);
+                        } while (Persona.TeléfonoFijo <= 2100000 || Persona.TeléfonoFijo >= 4900000);
+                        do
+                        {
+                            printf("Dirección           : ");
+                            scanf("%s", &Persona.Dirección);
+                        } while (strlen(Persona.Dirección) == 0);
+                        getchar();
+                        do
+                        {
+                            printf("Sexo (m/f)          : ");
+                            scanf("%c", &Persona.Sexo);
+                        } while (Persona.Sexo != 'm' && Persona.Sexo != 'f');
+                        if (!Vacio)
+                            fprintf(Archivo, "\n");
+                        fprintf(Archivo, "%d\n", Persona.CI);
+                        fprintf(Archivo, "%s\n", Persona.Nombre);
+                        fprintf(Archivo, "%d\n", Persona.Celular);
+                        fprintf(Archivo, "%d\n", Persona.TeléfonoFijo);
+                        fprintf(Archivo, "%s\n", Persona.Dirección);
+                        fprintf(Archivo, "%c", Persona.Sexo);
+                        printf("¿Desea adicionar otro registro (s/n)? ");
+                        getchar();
+                        scanf("%c", &Respuesta);
+                    } while (Respuesta != 'n');
+                    fclose(Archivo);
+                    break;
+                case 3:
+                    // Paso 1: Cargar los registros del archivo al vector
+                    Vacio = ArchivoVacio();
+                    if (!Vacio)
+                    {
+                        Archivo = fopen("Agenda.txt", "r");
+                        cont = 0;
+                        while (feof(Archivo) == 0)
+                        {
+                            cont++;
+                            fscanf(Archivo, "%d", &Personas[cont].CI);
+                            if (feof(Archivo) == 0)
+                            {
+                                fscanf(Archivo, "%s", &Personas[cont].Nombre);
+                                fscanf(Archivo, "%d", &Personas[cont].Celular);
+                                fscanf(Archivo, "%d", &Personas[cont].TeléfonoFijo);
+                                fscanf(Archivo, "%s", &Personas[cont].Dirección);
+                                fscanf(Archivo, "%c", &Personas[cont].Sexo);
+                            }
+                            else
+                                cont--;
+                        }
+                        fclose(Archivo);
+                        // Paso 2: Ingresar el CI del registro que se desea eliminar
+                        printf("Ingrese el CI que desea borrar\n");
+                        do
+                        {
+                            printf("CI                  : ");
+                            scanf("%d", &CI);
+                        } while (CI <= 100000 || CI >= 20000000);
+                        printf("\n");
+                        // Paso 3: Buscar el CI en los registros del vector
+                        reg = 0;
+                        for (i = 1; i <= cont; i++)
+                        {
+                            if (Personas[i].CI == CI)
+                                reg = i;
+                        }
+                        // Paso 4: Mostrar los datos del registro y pedir confirmación de eliminación
+                        if (reg > 0)
+                        {
+                            printf("CI                  : %d\n", Personas[reg].CI);
+                            printf("Nombre              : %s\n", Personas[reg].Nombre);
+                            printf("Celular             : %d\n", Personas[reg].Celular);
+                            printf("Teléfono Fijo       : %d\n", Personas[reg].TeléfonoFijo);
+                            printf("Dirección           : %s\n", Personas[reg].Dirección);
+                            printf("Sexo                : ");
+                            if (Personas[reg].Sexo == 'm')
+                                printf("Masculino\n");
+                            else
+                                printf("Femenino\n");
+                            printf("\n");
+                            getchar();
+                            printf("¿Realmente desea borrar este registro (s/n)? ");
+                            scanf("%c", &Respuesta);
+                            // Paso 5: Guardar el vector en el archivo sin el registro que se debe eliminar
+                            if (Respuesta == 's')
+                            {
+                                Archivo = fopen("Agenda.txt", "w");
+                                for (i = 1; i <= cont; i++)
+                                {
+                                    if (i != reg)
+                                    {
+                                        if (i != 1)
+                                            fprintf(Archivo, "\n");
+                                        fprintf(Archivo, "%d\n", Personas[i].CI);
+                                        fprintf(Archivo, "%s\n", Personas[i].Nombre);
+                                        fprintf(Archivo, "%d\n", Personas[i].Celular);
+                                        fprintf(Archivo, "%d\n", Personas[i].TeléfonoFijo);
+                                        fprintf(Archivo, "%s\n", Personas[i].Dirección);
+                                        fprintf(Archivo, "%c", Personas[i].Sexo);
+                                    }
+                                }
+                                fclose(Archivo);
+                                printf("¡Se eliminó el registro exitosamente!");
+                            }
+                            else
+                                printf("No se encuentra ese CI en el archivo!\n");
+                            getchar();
+                            getchar();
+                        }
+                        else
+                        {
+                            printf("El archivo está vacío!\n");
+                            getchar();
+                        }
+                        break;
+                    case 4:
+                        // Paso 1: Cargar los registros del archivo al vector
+                        Vacio = ArchivoVacio();
+                        if (!Vacio)
+                        {
+                            Archivo = fopen("Agenda.txt", "r");
+                            cont = 0;
+                            while (feof(Archivo) == 0)
+                            {
+                                cont++;
+                                fscanf(Archivo, "%d", &Personas[cont].CI);
+                                if (feof(Archivo) == 0)
+                                {
+                                    fscanf(Archivo, "%s", &Personas[cont].Nombre);
+                                    fscanf(Archivo, "%d", &Personas[cont].Celular);
+                                    fscanf(Archivo, "%d", &Personas[cont].TeléfonoFijo);
+                                    fscanf(Archivo, "%s", &Personas[cont].Dirección);
+                                    fscanf(Archivo, "%c", &Personas[cont].Sexo);
+                                }
+                                else
+                                    cont--;
+                            }
+                            fclose(Archivo);
+                            // Paso 2: Ingresar el CI del registro que se desea modificar
+                            printf("Ingrese el CI que desea modificar\n");
+                            do
+                            {
+                                printf("CI                  : ");
+                                scanf("%d", &CI);
+                            } while (CI <= 100000 || CI >= 20000000);
+                            printf("\n");
+                            // Paso 3: Buscar el CI en los registros del vector
+                            reg = 0;
+                            for (i = 1; i <= cont; i++)
+                            {
+                                if (Personas[i].CI == CI)
+                                    reg = i;
+                            }
+                            // Paso 4: Mostrar los datos del registro como menú
+                            // Paso 4: Mostrar los datos del registro como menú
+                            if (reg >= 0)
+                            {
+                                do
+                                {
+                                    system("cls");
+                                    printf("    MODIFICACIÓN DE REGISTRO\n\n");
+                                    printf("(1) CI             : %d\n", Personas[reg].CI);
+                                    printf("(2) Nombre         : %s\n", Personas[reg].Nombre);
+                                    printf("(3) Celular        : %d\n", Personas[reg].Celular);
+                                    printf("(4) Teléfono Fijo  : %d\n", Personas[reg].TelefonoFijo);
+                                    printf("(5) Dirección      : %s\n", Personas[reg].Direccion);
+                                    printf("(6) Sexo           : ");
+                                    if (Personas[reg].Sexo == 'm')
+                                        printf("Masculino\n");
+                                    else
+                                        printf("Femenino\n");
+                                    printf("(7) Salir\n\n");
+                                    printf("    Campo a modificar: ");
+                                    do
+                                    {
+                                        scanf("%d", &Opción2);
+                                    } while (Opción2 < 1 || Opción2 > 7);
+                                    getchar();
+                                    // Paso 5: Modificar los campos del registro requeridos
+                                    if (Opción2 < 7)
+                                    {
+                                        system("cls");
+                                    switch (Opción2)
+                                    {
+                                        case 1:
+                                            do
+                                            {
+                                                printf("CI             : ");
+                                                scanf("%d", &Personas[reg].CI);
+                                            } while (Personas[reg].CI <= 100000 || Personas[reg].CI >= 20000000);
+                                            break;
+                                        case 2:
+                                            do
+                                            {
+                                                printf("Nombre         : ");
+                                                scanf("%s", &Personas[reg].Nombre);
+                                            } while (strlen(Personas[reg].Nombre) == 0);
+                                            break;
+                                        case 3:
+                                            do
+                                            {
+                                                printf("Celular        : ");
+                                                scanf("%d", &Personas[reg].Celular);
+                                            } while (Personas[reg].Celular <= 6000000 || Personas[reg].Celular >= 70000000);
+                                            break;
+                                        case 4:
+                                            do
+                                            {
+                                                printf("Teléfono Fijo  : ");
+                                                scanf("%d", &Personas[reg].TelefonoFijo);
+                                            } while (Personas[reg].TelefonoFijo <= 2100000 || Personas[reg].TelefonoFijo >= 2800000);
+                                            break;
+                                        case 5:
+                                            do
+                                            {
+                                                printf("Dirección      : ");
+                                                scanf("%s", &Personas[reg].Direccion);
+                                            } while (strlen(Personas[reg].Direccion) == 0);
+                                            break;
+                                        case 6:
+                                            do
+                                            {
+                                                printf("Sexo (m/f)     : ");
+                                                scanf("%c", &Personas[reg].Sexo);
+                                            } while (Personas[reg].Sexo != 'm' && Personas[reg].Sexo != 'f');
+                                            break;
+                                    }
+                                }
+
+                            // Paso 6: Guardar el vector en el archivo con las modificaciones realizadas
+                            Archivo = fopen("Agenda.txt", "w");
+                            for (i = 1; i <= cont; i++)
+                            {
+                                fprintf(Archivo, "%d\n", Personas[i].CI);
+                                fprintf(Archivo, "%s\n", Personas[i].Nombre);
+                                fprintf(Archivo, "%d\n", Personas[i].Celular);
+                                fprintf(Archivo, "%d\n", Personas[i].TelefonoFijo);
+                                fprintf(Archivo, "%s\n", Personas[i].Direccion);
+                                fprintf(Archivo, "%c\n", Personas[i].Sexo);
+                            }
+                            fclose(Archivo);
+                        } while (Opción2 < 7);
+                    }
+                    else
+                    {
+                        printf("¡No se encuentra ese CI en el archivo!\n");
+                        getchar();
+                        getchar();
+                    }
+                    else
+                    {
+                        printf("¡El archivo está vacío!\n");
+                        getchar();
+                    }
+                    break;
+
+                    case 5:
+                    Vacio = ArchivoVacio();
+                    if (!Vacio)
+                    {
+                        Archivo = fopen("Agenda.txt", "r");
+                        printf("--------------------------------------------\n");
+                        printf("                  PERSONAS\n");
+                        printf("--------------------------------------------\n");
+                        while (feof(Archivo) == 0)
+                        {
+                            fscanf(Archivo, "%d\n", &Persona.CI);
+                            if (feof(Archivo) == 0)
+                            {
+                                printf("CI             : %d\n", Persona.CI);
+                                printf("Nombre         : ");
+                                fscanf(Archivo, "%s\n", &Persona.Nombre);
+                                printf("%s\n", Persona.Nombre);
+                                printf("Celular        : ");
+                                fscanf(Archivo, "%d\n", &Persona.Celular);
+                                printf("%d\n", Persona.Celular);
+                                printf("Teléfono Fijo  : ");
+                                fscanf(Archivo, "%d\n", &Persona.TelefonoFijo);
+                                printf("%d\n", Persona.TelefonoFijo);
+                                printf("Dirección      : ");
+                                fscanf(Archivo, "%s\n", &Persona.Direccion);
+                                printf("%s\n", Persona.Direccion);
+                                printf("Sexo           : ");
+                                fscanf(Archivo, "%c\n", &Persona.Sexo);
+                                if (Persona.Sexo == 'm')
+                                    printf("Masculino\n");
+                                else
+                                    printf("Femenino\n");
+                                printf("--------------------------------------------\n");
+                            }
+                        }
+                        fclose(Archivo);
+                        getchar();
+                    }
+                    else
+                    {
+                        printf("¡El archivo está vacío!\n");
+                        getchar();
+                    }
+                break;
+        } while (Opción < 6);
+        return 0;
+        }
