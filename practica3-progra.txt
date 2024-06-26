@@ -1,0 +1,126 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Media;
+using System.Text;
+using System.Windows.Forms;
+
+namespace NúmeroSecreto
+{
+    public partial class frmNúmeroSecreto : Form
+    {
+        public frmNúmeroSecreto()
+        {
+            InitializeComponent();
+        }
+
+        static Random Azar = new Random();
+        static int NúmeroSecreto, Jugador, Jugadores;
+        static bool Inicio;
+
+        private void frmNúmeroSecreto_Load(object sender, EventArgs e)
+        {
+            int i;
+            cboAdivina.Items.Clear();
+            for (i = 1; i <= 1000; i++)
+                cboAdivina.Items.Add(i);
+            nudJugadores.Minimum = 2;
+            nudJugadores.Maximum = 4;
+            nudJugadores.Value = 4;
+            Detener();
+            IniciarJuego();
+        }
+
+        private void IniciarJuego()
+        {
+            Inicio = true;
+            NúmeroSecreto = Azar.Next(1, 1000);
+            Jugadores = Convert.ToInt16(nudJugadores.Value);
+            labInstrucción.Text = "";
+            cboAdivina.SelectedIndex = 499;
+            cboAdivina.Focus();
+            Inicio = false;
+        }
+
+        private void Detener()
+        {
+            labJugadores.Enabled = true;
+            nudJugadores.Enabled = true;
+            btnJugar.Enabled = true;
+            btnDetener.Enabled = false;
+            labAdivina.Visible = false;
+            cboAdivina.Visible = false;
+            labInstrucción.Text = "";
+        }
+
+        private void nudJugadores_ValueChanged(object sender, EventArgs e)
+        {
+            Jugadores = Convert.ToInt16(nudJugadores.Value);
+            IniciarJuego();
+        }
+
+        private void btnJugar_Click(object sender, EventArgs e)
+        {
+            Jugador = 1;
+            labJugadores.Enabled = false;
+            nudJugadores.Enabled = false;
+            btnJugar.Enabled = false;
+            btnDetener.Enabled = true;
+            labAdivina.Text = "Jugador " + Convert.ToString(Jugador) + " ¿Cuál es mi número?";
+            labAdivina.Visible = true;
+            cboAdivina.Visible = true;
+            IniciarJuego();
+        }
+
+        private void btnDetener_Click(object sender, EventArgs e)
+        {
+            Detener();
+        }
+
+        private void btnSalir_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
+
+        private void cboAdivina_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            int Respuesta;
+            string Archivo;
+            if (!Inicio)
+            {
+                Respuesta = cboAdivina.SelectedIndex + 1;
+                if (Respuesta == NúmeroSecreto)
+                {
+                    Archivo = "Ovación.wav";
+                    labInstrucción.Text = "¡Ganaste!";
+                }
+                else
+                {
+                    if (Respuesta < NúmeroSecreto)
+                    {
+                        Archivo = "Nota Grave.wav";
+                        labInstrucción.Text = "¡Muy bajo!";
+                    }
+                    else
+                    {
+                        Archivo = "Nota Aguda.wav";
+                        labInstrucción.Text = "¡Muy alto!";
+                    }
+                    Jugador++;
+                    if (Jugador > Jugadores)
+                        Jugador = 1;
+                    labAdivina.Text = "Jugador " + Convert.ToString(Jugador) + " ¿Cuál es mi número?";
+                }
+                SoundPlayer simpleSound = new SoundPlayer(Archivo);
+                simpleSound.Play();
+                if (Respuesta == NúmeroSecreto)
+                {
+                    MessageBox.Show("Ganaste Jugador #" + Convert.ToString(Jugador));
+                    Detener();
+                }
+            }
+        }
+    }
+}
